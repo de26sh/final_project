@@ -13,3 +13,9 @@ use App\Http\Controllers\CareersController;
 Route::get('/',[HomeController::class,'index']);
 Route::get('/aboutus',[AboutUsController::class,'aboutusIndex']);
 Route::get('/careers', [CareersController::class, 'index']);
+
+
+
+
+
+

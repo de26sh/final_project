@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\AboutUsController;
+use App\Http\Controllers\Admin\AboutUsController;
 use App\Http\Controllers\CareersController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
@@ -10,7 +10,6 @@ use App\Http\Controllers\FrontendController;
 use App\Http\Controllers\Admin\SubCategoryController;
 use App\Http\Controllers\FamilyController;
 use App\Http\Controllers\Admin\SliderController;
-use App\Http\Controllers\Admin\AboutController;
 use App\Http\Controllers\Admin\ContactController;
 use App\Http\Controllers\Admin\ProductController;
 
@@ -48,7 +47,7 @@ Route::put('/family/update/{id}', [FamilyController::class, 'update'])->name('fa
 Route::delete('/family/delete/{family}', [FamilyController::class, 'destroy'])->name('family.destroy');
 
 Route::resource('slider', SliderController::class);
-Route::resource('about', AboutController::class);
+Route::resource('about', AboutUsController::class);
 Route::resource('contact', ContactController::class);
 
 // Product Routes

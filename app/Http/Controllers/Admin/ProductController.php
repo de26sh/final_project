@@ -113,7 +113,7 @@ class ProductController extends Controller
                 ]);
             }
         }
-        dd("Here");
+        // dd("Here");
         return redirect()->route('admin.product.index')
                          ->with('success','Product Updated Successfully');
     }

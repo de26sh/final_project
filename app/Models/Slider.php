@@ -12,6 +12,8 @@ class Slider extends Model
     protected $fillable = [
         'title',
         'subtitle',
-        'image'
+        'description',
+        'image',
+        'status'
     ];
 }

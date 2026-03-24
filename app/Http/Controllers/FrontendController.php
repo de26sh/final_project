@@ -93,9 +93,53 @@ class FrontendController extends Controller
         $unitPrice  = $product->price;
         $totalPrice = $unitPrice * $quantity;
 
-        // Create order
+        // Find existing customer by email OR create new one
+        $customer = Customer::where('email', $request->email)->first();
+
+        $customerData = [
+            'first_name'    => $request->first_name,
+            'last_name'     => $request->last_name,
+            'company_name'  => $request->company_name,
+            'email'         => $request->email,
+            'phone'         => $request->phone,
+            'country'       => $request->country,
+            'address_line1' => $request->address_line1,
+            'address_line2' => $request->address_line2,
+            'city'          => $request->city,
+            'state'         => $request->state,
+            'postcode'      => $request->postcode,
+            'ship_to_different' => $request->has('ship_to_different'),
+        ];
+
+        if ($request->has('ship_to_different')) {
+            $customerData = array_merge($customerData, [
+                'shipping_first_name'    => $request->shipping_first_name,
+                'shipping_last_name'     => $request->shipping_last_name,
+                'shipping_company_name'  => $request->shipping_company_name,
+                'shipping_email'         => $request->shipping_email,
+                'shipping_phone'         => $request->shipping_phone,
+                'shipping_country'       => $request->shipping_country,
+                'shipping_address_line1' => $request->shipping_address_line1,
+                'shipping_address_line2' => $request->shipping_address_line2,
+                'shipping_city'          => $request->shipping_city,
+                'shipping_state'         => $request->shipping_state,
+                'shipping_postcode'      => $request->shipping_postcode,
+            ]);
+        }
+
+        if ($customer) {
+            // Update existing customer with latest info
+            $customer->update($customerData);
+        } else {
+            // Create new customer
+            $customer = Customer::create($customerData);
+        }
+
+        // Create order linked to customer
         $order = Order::create([
+            'order_number'   => Order::generateOrderNumber(),
             'product_id'     => $product->id,
+            'customer_id'    => $customer->id,
             'quantity'       => $quantity,
             'unit_price'     => $unitPrice,
             'total_price'    => $totalPrice,
@@ -104,42 +148,8 @@ class FrontendController extends Controller
             'notes'          => $request->notes,
         ]);
 
-        // Create customer
-        $customerData = $request->only([
-            'first_name',
-            'last_name',
-            'company_name',
-            'email',
-            'phone',
-            'country',
-            'address_line1',
-            'address_line2',
-            'city',
-            'state',
-            'postcode',
-        ]);
-        $customerData['order_id']           = $order->id;
-        $customerData['ship_to_different']  = $request->has('ship_to_different');
-
-        if ($request->has('ship_to_different')) {
-            $customerData = array_merge($customerData, $request->only([
-                'shipping_first_name',
-                'shipping_last_name',
-                'shipping_company_name',
-                'shipping_email',
-                'shipping_phone',
-                'shipping_country',
-                'shipping_address_line1',
-                'shipping_address_line2',
-                'shipping_city',
-                'shipping_state',
-                'shipping_postcode',
-            ]));
-        }
-
-        Customer::create($customerData);
-
-        return redirect()->route('frontend.order.success', $order->id)
+        return redirect()
+            ->route('frontend.order.success', $order->id)
             ->with('success', 'Order placed successfully!');
     }
 }

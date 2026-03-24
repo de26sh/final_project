@@ -56,13 +56,27 @@
                         <p>Product</p>
                     </a>
                 </li>
-                 <li class="nav-item">
+                <li class="nav-item">
+                    <a href="{{ route('admin.orders.index') }}"
+                        class="nav-link {{ request()->is('admin/orders*') ? 'active' : '' }}">
+                        <i class="nav-icon bi bi-bag-check-fill"></i>
+                        <p>Orders</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('admin.customers.index') }}"
+                        class="nav-link {{ request()->is('admin/customers*') ? 'active' : '' }}">
+                        <i class="nav-icon bi bi-people-fill"></i>
+                        <p>Customers</p>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a href="{{ route('admin.family.index') }}" class="nav-link">
                         <i class="nav-icon bi bi-speedometer"></i>
                         <p>Family</p>
                     </a>
                 </li>
- 
+
                 <li class="nav-item">
                     <a href="#" class="nav-link">
                         <i class="nav-icon bi bi-box-seam-fill"></i>
@@ -79,7 +93,7 @@
                             </a>
                         </li>
                     </ul>
-                     <ul class="nav nav-treeview">
+                    <ul class="nav nav-treeview">
                         <li class="nav-item">
                             <a href="{{ route('admin.about.index') }}" class="nav-link">
                                 <i class="nav-icon bi bi-circle"></i>

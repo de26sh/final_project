@@ -7,8 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class Order extends Model
 {
     protected $fillable = [
-        'product_id', 'quantity', 'unit_price',
-        'total_price', 'payment_method', 'status', 'notes',
+        'order_number', 'product_id', 'customer_id', 'quantity',
+        'unit_price', 'total_price', 'payment_method', 'status', 'notes',
     ];
 
     public function product()
@@ -18,6 +18,16 @@ class Order extends Model
 
     public function customer()
     {
-        return $this->hasOne(Customer::class);
+        return $this->belongsTo(Customer::class);
+    }
+
+    // Generate unique order number like ORD-2026-48291
+    public static function generateOrderNumber(): string
+    {
+        do {
+            $number = 'ORD-' . date('Y') . '-' . random_int(10000, 99999);
+        } while (self::where('order_number', $number)->exists());
+
+        return $number;
     }
 }

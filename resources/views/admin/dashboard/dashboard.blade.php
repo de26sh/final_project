@@ -33,10 +33,10 @@
                             </span>
 
                             <div class="info-box-content">
-                                <span class="info-box-text">CPU Traffic</span>
+                                <span class="info-box-text">Total Product</span>
                                 <span class="info-box-number">
-                                    10
-                                    <small>%</small>
+                                    {{$productCount}}
+                                   
                                 </span>
                             </div>
                             <!-- /.info-box-content -->
@@ -51,7 +51,7 @@
                             </span>
 
                             <div class="info-box-content">
-                                <span class="info-box-text">Likes</span>
+                                <span class="info-box-text">Products Sold</span>
                                 <span class="info-box-number">41,410</span>
                             </div>
                             <!-- /.info-box-content -->
@@ -70,7 +70,7 @@
                             </span>
 
                             <div class="info-box-content">
-                                <span class="info-box-text">Sales</span>
+                                <span class="info-box-text">Inventory</span>
                                 <span class="info-box-number">760</span>
                             </div>
                             <!-- /.info-box-content -->
@@ -85,7 +85,7 @@
                             </span>
 
                             <div class="info-box-content">
-                                <span class="info-box-text">New Members</span>
+                                <span class="info-box-text">New registrations</span>
                                 <span class="info-box-number">2,000</span>
                             </div>
                             <!-- /.info-box-content -->

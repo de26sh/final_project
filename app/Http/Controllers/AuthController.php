@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Product;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
@@ -54,7 +55,8 @@ class AuthController extends Controller
     // Dashboard
     public function dashboard()
     {
-        return view('admin.dashboard.dashboard');
+        $productCount = Product::where('status','published')->count();
+        return view('admin.dashboard.dashboard',compact('productCount'));
     }
 
     // Logout

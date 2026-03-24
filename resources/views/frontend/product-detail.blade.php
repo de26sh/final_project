@@ -22,8 +22,8 @@
                         <div class="swiper-wrapper">
                             @foreach ($product->images as $image)
                                 <div class="swiper-slide">
-                                    <img class="img-responsive m-auto"
-                                        src="{{ asset('storage/' . $image->image) }}" alt="Thumbnail">
+                                    <img class="img-responsive m-auto" src="{{ asset('storage/' . $image->image) }}"
+                                        alt="Thumbnail">
                                 </div>
                             @endforeach
                         </div>
@@ -50,11 +50,14 @@
                         <p class="quickview-para">{{ $product->short_description }}</p>
                         <div class="pro-details-quality">
                             <div class="cart-plus-minus">
-                                <input class="cart-plus-minus-box" type="text" name="qtybutton" value="1" />
+                                <input class="cart-plus-minus-box" id="qtyInput" type="text" name="qtybutton"
+                                    value="1" min="1" />
                             </div>
                             <div class="pro-details-cart">
-                                <button class="add-cart btn btn-primary btn-hover-primary ml-4" href="#"> Add To
-                                    Cart</button>
+                                <a id="addToCartBtn" class="add-cart btn btn-primary btn-hover-primary ml-4"
+                                    href="{{ route('frontend.checkout', ['p_id' => Crypt::encrypt($product->id)]) }}?qty=1">
+                                    Add To Cart
+                                </a>
                             </div>
                         </div>
                         {{-- <div class="pro-details-wish-com disabled">
@@ -130,4 +133,32 @@
             </div>
         </div>
     </div>
+
+
+   <script>
+    const baseUrl = "{{ route('frontend.checkout', ['p_id' => Crypt::encrypt($product->id)]) }}";
+
+    function updateCartUrl() {
+        const qtyInput = document.getElementById('qtyInput');
+        const cartBtn  = document.getElementById('addToCartBtn');
+        let qty = parseInt(qtyInput.value) || 1;
+        if (qty < 1) qty = 1;
+        cartBtn.href = baseUrl + '?qty=' + qty;
+    }
+
+    // Wait for DOM + plugin to fully initialize
+    window.addEventListener('load', function () {
+
+        // Delegate clicks to parent — catches dynamically injected + / - buttons
+        document.querySelector('.cart-plus-minus').addEventListener('click', function () {
+            setTimeout(updateCartUrl, 100); // wait for plugin to update the value
+        });
+
+        // Also catch manual typing
+        document.getElementById('qtyInput').addEventListener('input', updateCartUrl);
+        document.getElementById('qtyInput').addEventListener('change', updateCartUrl);
+    });
+</script>
 @endsection
+
+

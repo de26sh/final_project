@@ -86,3 +86,13 @@ Route::get('/',[FrontendController::class,'index'])->name('frontend.index');
 //AboutUs
 Route::get('/about-us',[FrontendController::class,'about_us'])->name('frontend.aboutus');
 Route::get('/contact-us',[FrontendController::class,'contact_us'])->name('frontend.contactus');
+
+Route::get('/checkout/{p_id}',[FrontendController::class,'product_checkout'])->name('frontend.checkout');
+
+Route::get('/checkout/{p_id}', [FrontendController::class, 'product_checkout'])->name('frontend.checkout');
+Route::post('/checkout/place-order', [FrontendController::class, 'place_order'])->name('frontend.place_order');
+
+Route::get('/order/success/{id}', function ($id) {
+    $order = \App\Models\Order::with('customer', 'product')->findOrFail($id);
+    return view('frontend.checkout.success', compact('order'));
+})->name('frontend.order.success');

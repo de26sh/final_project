@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Mail\OrderStatusUpdated;
 use App\Models\Order;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class OrderController extends Controller
 {
@@ -31,8 +33,11 @@ class OrderController extends Controller
 
         $order->update(['status' => $request->status]);
 
+        $order->load('product', 'customer');
+        Mail::to($order->customer->email)->send(new OrderStatusUpdated($order));
+
         return redirect()
             ->route('admin.orders.show', $order->id)
-            ->with('success', 'Order status updated successfully.');
+            ->with('success', 'Order status updated and customer notified.');
     }
 }

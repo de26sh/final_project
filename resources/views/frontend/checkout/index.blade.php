@@ -1,4 +1,82 @@
 @extends('frontend.layout.app')
+<style>
+    .payment-method-modern {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .payment-card {
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        padding: 15px;
+        cursor: pointer;
+        transition: 0.3s;
+        background: #fff;
+    }
+
+    .payment-card:hover {
+        border-color: #ff6a00;
+    }
+
+    .payment-card.active {
+        border: 2px solid #ff6a00;
+        background: #fff7f0;
+    }
+
+    .payment-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .payment-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .payment-left img {
+        width: 40px;
+        height: 40px;
+        object-fit: contain;
+    }
+
+    .payment-left h5 {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 600;
+    }
+
+    .payment-left p {
+        margin: 0;
+        font-size: 13px;
+        color: #777;
+    }
+
+    .checkmark {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        border: 2px solid #ccc;
+        position: relative;
+    }
+
+    .payment-card.active .checkmark {
+        border-color: #ff6a00;
+    }
+
+    .payment-card.active .checkmark::after {
+        content: '';
+        width: 10px;
+        height: 10px;
+        background: #ff6a00;
+        border-radius: 50%;
+        position: absolute;
+        top: 3px;
+        left: 3px;
+    }
+</style>
 @section('content')
 
     <div class="checkout-area pt-100px pb-100px">
@@ -237,32 +315,45 @@
                                 </div>
 
                                 {{-- Payment Method --}}
-                                <div class="payment-method">
-                                    <div class="payment-accordion element-mrg">
-                                        <div id="faq" class="panel-group">
-                                            <div class="panel panel-default single-my-account m-0">
-                                                <div class="panel-heading my-account-title">
-                                                    <h4 class="panel-title">
-                                                        <a data-bs-toggle="collapse" href="#my-account-3">
-                                                            Cash on Delivery
-                                                        </a>
-                                                    </h4>
-                                                </div>
-                                                <div id="my-account-3" class="panel-collapse collapse show"
-                                                    data-bs-parent="#faq">
-                                                    <div class="panel-body">
-                                                        <p>Pay with cash upon delivery of your order.</p>
-                                                    </div>
+                                <div class="payment-method-modern">
+
+                                    <label class="payment-card active" data-value="cod">
+                                        <input type="radio" name="payment_method" value="cod" checked hidden>
+
+                                        <div class="payment-content">
+                                            <div class="payment-left">
+                                                <img src="https://cdn-icons-png.flaticon.com/512/2331/2331970.png"
+                                                    alt="COD">
+                                                <div>
+                                                    <h5>Cash on Delivery</h5>
+                                                    <p>Pay when you receive the product</p>
                                                 </div>
                                             </div>
+                                            <div class="checkmark"></div>
                                         </div>
-                                    </div>
+                                    </label>
+
+                                    <label class="payment-card" data-value="razorpay">
+                                        <input type="radio" name="payment_method" value="razorpay" hidden>
+
+                                        <div class="payment-content">
+                                            <div class="payment-left">
+                                                <img src="https://razorpay.com/assets/razorpay-logo.svg" alt="Razorpay">
+                                                <div>
+                                                    <h5>Pay Online</h5>
+                                                    <p>UPI, Cards, Net Banking</p>
+                                                </div>
+                                            </div>
+                                            <div class="checkmark"></div>
+                                        </div>
+                                    </label>
+
                                 </div>
                             </div>
 
                             <div class="Place-order mt-25">
                                 <button type="submit" class="btn-hover w-100 d-block text-center"
-                                    style="padding: 15px 30px; font-size: 16px; font-weight: 600; 
+                                    style="padding: 15px 30px; font-size: 16px; font-weight: 600;
                    letter-spacing: 1px; cursor: pointer; border: none; background-color: var(--bs-orange);
     color: white;">
                                     Place Order
@@ -276,9 +367,27 @@
         </div>
     </div>
 
+
+    <script>
+        document.querySelectorAll('.payment-card').forEach(card => {
+            card.addEventListener('click', function() {
+                document.querySelectorAll('.payment-card').forEach(c => c.classList.remove('active'));
+
+                this.classList.add('active');
+                this.querySelector('input').checked = true;
+            });
+        });
+    </script>
+
+    {{-- Razorpay SDK --}}
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
     <script>
         const unitPrice = {{ $product->price }};
         let qty = {{ $quantity }};
+
+        const form = document.querySelector('form');
+        const submitBtn = document.querySelector('[type=submit]');
 
         const hiddenQty = document.getElementById('hiddenQty');
         const qtyDisplay = document.getElementById('qtyDisplay');
@@ -301,22 +410,202 @@
             summaryTotal.textContent = formatINR(total);
         }
 
-        document.getElementById('qtyPlus').addEventListener('click', function() {
+        document.getElementById('qtyPlus').onclick = () => {
             qty++;
             updateSummary();
-        });
+        };
+        document.getElementById('qtyMinus').onclick = () => {
+            if (qty > 1) qty--;
+            updateSummary();
+        };
 
-        document.getElementById('qtyMinus').addEventListener('click', function() {
-            if (qty > 1) {
-                qty--;
-                updateSummary();
-            }
-        });
-
-        // Ship to different address toggle
-        document.getElementById('shipToggle').addEventListener('change', function() {
+        document.getElementById('shipToggle').onchange = function() {
             document.getElementById('shippingSection').style.display = this.checked ? 'block' : 'none';
+        };
+
+        document.querySelectorAll('input[name="payment_method"]').forEach(r => {
+            r.onchange = function() {
+                document.getElementById('cod-desc').style.display = this.value === 'cod' ? 'block' : 'none';
+                document.getElementById('razorpay-desc').style.display = this.value === 'razorpay' ? 'block' :
+                    'none';
+            };
         });
+
+        // ✅ VALIDATION FUNCTION
+        function validateForm() {
+            let errors = [];
+
+            const requiredFields = [{
+                    name: 'first_name',
+                    label: 'First Name'
+                },
+                {
+                    name: 'last_name',
+                    label: 'Last Name'
+                },
+                {
+                    name: 'country',
+                    label: 'Country'
+                },
+                {
+                    name: 'address_line1',
+                    label: 'Address'
+                },
+                {
+                    name: 'city',
+                    label: 'City'
+                },
+                {
+                    name: 'state',
+                    label: 'State'
+                },
+                {
+                    name: 'postcode',
+                    label: 'Postcode'
+                },
+                {
+                    name: 'phone',
+                    label: 'Phone'
+                },
+                {
+                    name: 'email',
+                    label: 'Email'
+                }
+            ];
+
+            requiredFields.forEach(field => {
+                const value = form.querySelector(`[name="${field.name}"]`).value.trim();
+                if (!value) {
+                    errors.push(field.label + ' is required');
+                }
+            });
+
+            // Email format
+            const email = form.querySelector('[name="email"]').value;
+            if (email && !/^\S+@\S+\.\S+$/.test(email)) {
+                errors.push('Invalid email format');
+            }
+
+            if (errors.length > 0) {
+                showErrors(errors);
+                return false;
+            }
+
+            return true;
+        }
+
+        // ✅ SHOW ERRORS NICE WAY
+        function showErrors(errors) {
+            let html = '<div class="alert alert-danger"><ul style="margin:0;">';
+            errors.forEach(err => {
+                html += `<li>${err}</li>`;
+            });
+            html += '</ul></div>';
+
+            let container = document.querySelector('.billing-info-wrap');
+            container.insertAdjacentHTML('afterbegin', html);
+
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        // ✅ FORM SUBMIT
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // remove old errors
+            document.querySelectorAll('.alert-danger').forEach(el => el.remove());
+
+            if (!validateForm()) return;
+
+            const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = 'Processing...';
+
+            if (paymentMethod === 'cod') {
+                form.action = "{{ route('frontend.place_order') }}";
+                form.submit();
+                return;
+            }
+
+            const formData = new FormData(form);
+
+            fetch("{{ route('frontend.razorpay.create_order') }}", {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: formData,
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.razorpay_order_id) {
+                        openRazorpay(data);
+                    } else {
+                        alert(data.message || 'Payment init failed');
+                        resetBtn();
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert('Server error. Check console.');
+                    resetBtn();
+                });
+        });
+
+        function resetBtn() {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'Place Order';
+        }
+
+        // ✅ RAZORPAY
+        function openRazorpay(data) {
+            const options = {
+                key: data.key_id,
+                amount: data.amount,
+                currency: data.currency,
+                name: '{{ config('app.name') }}',
+                description: data.name,
+                order_id: data.razorpay_order_id,
+                prefill: {
+                    name: data.customer_name,
+                    email: data.customer_email,
+                    contact: data.customer_phone,
+                },
+                theme: {
+                    color: '#ff6a00'
+                },
+
+                handler: function(response) {
+                    fetch("{{ route('frontend.razorpay.verify') }}", {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            body: JSON.stringify(response),
+                        })
+                        .then(res => res.json())
+                        .then(result => {
+                            if (result.success) {
+                                window.location.href = result.redirect;
+                            } else {
+                                alert('Payment failed: ' + result.message);
+                                resetBtn();
+                            }
+                        });
+                },
+
+                modal: {
+                    ondismiss: resetBtn
+                }
+            };
+
+            new Razorpay(options).open();
+        }
     </script>
 
 @endsection

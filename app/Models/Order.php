@@ -7,8 +7,17 @@ use Illuminate\Database\Eloquent\Model;
 class Order extends Model
 {
     protected $fillable = [
-        'order_number', 'product_id', 'customer_id', 'quantity',
-        'unit_price', 'total_price', 'payment_method', 'status', 'notes',
+        'order_number',
+        'product_id',
+        'customer_id',
+        'quantity',
+        'unit_price',
+        'total_price',
+        'payment_method',
+        'status',
+        'notes',
+        'razorpay_order_id',
+        'payment_id',
     ];
 
     public function product()

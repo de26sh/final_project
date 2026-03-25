@@ -7,7 +7,7 @@
         {{-- Page Header --}}
         <div class="row mb-3 mt-3">
             <div class="col-12 d-flex justify-content-between align-items-center">
-                <h3 class="mb-0">Order #{{ $order->id }}</h3>
+                <h3 class="mb-0">Order #{{ $order->order_number }}</h3>
                 <a href="{{ route('admin.orders.index') }}" class="btn btn-outline-secondary btn-sm">
                     <i class="bi bi-arrow-left"></i> Back to Orders
                 </a>

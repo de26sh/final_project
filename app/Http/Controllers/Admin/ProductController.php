@@ -18,9 +18,9 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Product::with(['category','subCategory','family','images'])
-                            ->latest()
-                            ->get();
+        $products = Product::with(['category', 'subCategory', 'family', 'images'])
+            ->latest()
+            ->get();
 
         return view('admin.product.index', compact('products'));
     }
@@ -33,7 +33,7 @@ class ProductController extends Controller
         $categories = Category::all();
         $families = Family::all();
 
-        return view('admin.product.create', compact('categories','families'));
+        return view('admin.product.create', compact('categories', 'families'));
     }
 
     /**
@@ -41,13 +41,13 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
+        // dd("hi");
         $request->validate([
             'name' => 'required',
             'category_id' => 'required',
             'sub_category_id' => 'required',
             'images.*' => 'image|mimes:jpg,jpeg,png|max:2048'
         ]);
-
         $product = Product::create($request->except('images'));
 
         // Multiple Image Upload
@@ -64,7 +64,7 @@ class ProductController extends Controller
         }
 
         return redirect()->route('admin.product.index')
-                         ->with('success','Product Created Successfully');
+            ->with('success', 'Product Created Successfully');
     }
 
     /**
@@ -115,7 +115,7 @@ class ProductController extends Controller
         }
         // dd("Here");
         return redirect()->route('admin.product.index')
-                         ->with('success','Product Updated Successfully');
+            ->with('success', 'Product Updated Successfully');
     }
 
     /**
@@ -133,7 +133,7 @@ class ProductController extends Controller
         $product->delete();
 
         return redirect()->route('admin.product.index')
-                         ->with('success','Product Deleted Successfully');
+            ->with('success', 'Product Deleted Successfully');
     }
 
     /**
@@ -146,17 +146,17 @@ class ProductController extends Controller
     }
 
     public function deleteImage($id)
-{
-    $image = ProductImage::findOrFail($id);
+    {
+        $image = ProductImage::findOrFail($id);
 
-    // delete file from storage
-    if (Storage::disk('public')->exists($image->image)) {
-        Storage::disk('public')->delete($image->image);
+        // delete file from storage
+        if (Storage::disk('public')->exists($image->image)) {
+            Storage::disk('public')->delete($image->image);
+        }
+
+        // delete database record
+        $image->delete();
+
+        return back()->with('success', 'Image Deleted Successfully');
     }
-
-    // delete database record
-    $image->delete();
-
-    return back()->with('success', 'Image Deleted Successfully');
-}
 }
